@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title> 玥的 HTML </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#03a6f3">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT:400,400i,700|Raleway:300,400,500,600,700"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body>
+<canvas id="theCanvas"></canvas>
+<script>
+    const theCanvas = document.getElementById('theCanvas'),
+        ctx = theCanvas.getContext('2d'),
+        current_point = {
+            x: null, //当前鼠标x
+            y: null, //当前鼠标y
+            max: 20000,
+        };
+
+    let canvas_width = theCanvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+        canvas_height = theCanvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+        random_points = [],
+        all_points = [];
+
+    theCanvas.style = "position: fixed; top: 0px; left: 0px;";
+
+
+    function draw() {
+        //清屏
+        ctx.clearRect(0, 0, canvas_width, canvas_height);
+        let i, pi, x_dist, y_dist, dist, w;
+
+        //遍历点集合绘制线条，类似于握手问题，两个点只绘制一条线
+        random_points.forEach((p, index) => {
+            p.x += p.xa,		//按指定速度移动
+                p.y += p.ya,
+                //小球碰撞则速度取相反数
+                p.xa *= p.x > canvas_width || p.x < 0 ? -1 : 1,
+                p.ya *= p.y > canvas_height || p.y < 0 ? -1 : 1,
+                ctx.fillRect(p.x - 0.5, p.y - 0.5, 1, 1);		//绘制点
+
+            for (i = index + 1; i < all_points.length; i++) {
+                pi = all_points[i];
+                if (pi.x !== null && pi.y !== null) {
+                    x_dist = p.x - pi.x;
+                    y_dist = p.y - pi.y;
+                    dist = x_dist * x_dist + y_dist * y_dist;
+                    //当两点距离小于极限距离时会产生连线，当第二个点是鼠标所产生点时，第一个点在范围内会产生向鼠标点的速度，产生吸附效果
+                    dist < pi.max && (pi === current_point && dist >= pi.max / 2 && (p.x -= 0.03 * x_dist, p.y -= 0.03 * y_dist));
+                    //根据距离计算连线的透明度，使过度效果流畅
+                    w = (pi.max - dist) / pi.max;
+                    ctx.beginPath();
+                    ctx.lineWidth = w / 2;
+                    ctx.strokeStyle = `rgba(110,110,110,${w + 0.2})`;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(pi.x, pi.y);
+                    ctx.stroke();
+                }
+            }
+        }), requestAnimationFrame(draw);
+    }
+
+
+    //绑定事件，判断是否添加鼠标这个点
+    window.onmousemove = e => {
+        e = e || window.event;
+        current_point.x = e.clientX;
+        current_point.y = e.clientY;
+    };
+    window.onmouseout = () => {
+        current_point.x = null;
+        current_point.y = null;
+    };
+
+
+    //随机生成100个点
+    for (let i = 0; i < 100; i++) {
+
+        let x = Math.random() * canvas_width,	//初始坐标
+            y = Math.random() * canvas_height,
+            xa = 2 * Math.random() - 1,			//x速度
+            ya = 2 * Math.random() - 1,			//y速度
+            max = 6000;							//会产生连线的距离的平方
+
+        random_points[i] = {x, y, xa, ya, max};
+    }
+    //将鼠标的点添加至点集合中
+    all_points = [...random_points, current_point];
+
+    //只是背景特效-所以延迟执行
+    setTimeout(draw, 100);
+</script>
+<header>
+    <div class="header-top"></div>
+    <div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+        <div class="collapse navbar-collapse">
+            <div class="nav-sec">
+                <div class="container">
+                    <ul class="nav">
+                        <li class="nav-item"><a class="nav-link active" href="http://47.97.41.224/">首页</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/user/name">关于我们 </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./featured.html">特色</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./category.html">产品图片</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./category.html">前景规划</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./partner.html">人员分配</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./contact.html">联系方式</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 align-self-center sharing-sec">
+                    <div class="share align-middle">
+                        <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                        <span class="instagram"><i class="fa fa-instagram"></i></span>
+                        <span class="twitter"><i class="fa fa-twitter"></i></span>
+                        <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                        <span class="google"><i class="fa fa-google-plus"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-4 align-self-center">
+                    <div class="logo-sec">
+                        <img src="../static/car.png" alt="logo">
+                        <h5> 欢迎访问</h5>
+                    </div>
+                </div>
+                <div class="col-md-4 align-self-center">
+                    <div class="search-sec">
+                        <div class="search"><span><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Banner Sec -->
+<section class="banner-sec" style="background:url(../static/home-banner.jpg)no-repeat;">
+    <div class="container">
+        <div class="banner-content">
+            <h1>欢迎了解我们的项目</h1>
+            <h4>这里有我们产品的图文展示</h4>
+            <a href="blog.html" class="btn more-btn">了解更多</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main body sec -->
+
+<section class="main-sec">
+    <div class="container">
+        <div class="standard-post-format">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Big post section -->
+                    <div class="post-item big-post">
+                        <h2>产品实例展示！</h2>
+                        <img src="../static/20170512174325845.gif" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">六月 29, 2019</li>
+                            <li class="breadcrumb-item"> 制作人 <a href="#" class="admin">学长</a></li>
+                            <li class="breadcrumb-item"><a href="#" class="fashion">项目实例 </a></li>
+                            <li class="breadcrumb-item">评论</li>
+                        </ol>
+                        <h5>
+                            首先是关于硬件部分，我们打算用树莓派3代B+履带坦克智能小车进行开发，它是采用树莓派3B+的开发板，以及支持c++和python编程，支持蓝牙和wifi双通讯，有摄像头方便后续开发。在软件方面，我们打算在web服务器对小车收集到的视频或者图片进行监控以及人脸识别，再将信息反馈。Web端应当实现控制小车方向的基本行走，和通过小车摄像头对其环境进行监控，收取暂存视频。小车能够实现自动避障，自动行走等功能。主要涉及到python
+                            web端，opencv，部分机器学习功能，html等。</h5>
+                        <a href="blog.html" class="continue-read">继续阅读</a>
+                        <div class="share align-middle">
+                            <span class="text">分享到</span>
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                    <!-- End Big post section -->
+                </div>
+            </div>
+            <div class="row small-post-sec">
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost2.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost3.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="static/spost4.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost2.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost3.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="post-item small-post">
+                        <img src="../static/spost4.jpg" alt="post-img">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">November 20, 2014</li>
+                            <li class="breadcrumb-item"> By <a href="#" class="">Admin</a></li>
+                        </ol>
+                        <h2><a href="#">A beautiful day with superb sunlight at beach!</a></h2>
+                        <h5>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+                            the industry's...
+                        </h5>
+                        <a href="blog-inner.html" class="continue-read">Continue Reading</a>
+                        <div class="share align-middle">
+                            <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                            <span class="instagram"><i class="fa fa-instagram"></i></span>
+                            <span class="twitter"><i class="fa fa-twitter"></i></span>
+                            <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                            <span class="google"><i class="fa fa-google-plus"></i></span>
+                            <span class="google"><i class="fa fa-commenting"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-sec">
+                <button class="btn load-more">加载更多</button>
+            </div>
+        </div>
+        <div class="tlinks">Collect from <a href="http://www.cssmoban.com/">网站建设</a></div>
+
+        <!-- Aside section start -->
+        <aside>
+            <div class="about-sec">
+                <h3>基本思路</h3>
+                <figure>
+                    <img src="../static/1.png" alt="profile">
+                </figure>
+                <h5>
+                    本项目产品诣在协助人类在人力所不能及的范围内监视、侦听，为人类采取正确行动提供现实有效的信息，避免因信息的缺失而导致的“人间悲剧”。首先，通过应用于搜救、公安办案系统方面，它可以充当人类的“感官”，深入人所不能及的地域，为救助人员提供受害者的信息，为进一步救援提供帮助，甚至代替救援人员进行救援是势在必行的。</h5>
+                <a href="about.html" class="read-more">阅读更多有关信息</a>
+                <div class="share align-middle">
+                    <span class="fb"><i class="fa fa-facebook-official"></i></span>
+                    <span class="instagram"><i class="fa fa-instagram"></i></span>
+                    <span class="twitter"><i class="fa fa-twitter"></i></span>
+                    <span class="pinterest"><i class="fa fa-pinterest"></i></span>
+                    <span class="google"><i class="fa fa-google-plus"></i></span>
+                </div>
+            </div>
+            <div class="category-sec">
+                <h3>分类</h3>
+                <ul>
+                    <li><a href="#" class="active">图片</a></li>
+                    <li><a href="#">At & Lifestyle</a></li>
+                    <li><a href="#">Health & Fitness</a></li>
+                    <li><a href="#">Landscapes</a></li>
+                    <li><a href="#">Travelling</a></li>
+                    <li><a href="#">Quotes</a></li>
+                    <li><a href="#">Music</a></li>
+                    <li><a href="#">Featured</a></li>
+                    <li><a href="#">Photography</a></li>
+                </ul>
+            </div>
+            <div class="most-read">
+                <h3>了解更多</h3>
+                <ul>
+                    <li>
+                        <figure style="background:url(../static/rsmall.jpg)no-repeat;"></figure>
+                        <div class="post-content">
+                            <h3><a href="#">Man Walking on the desert alone in sunset time.</a></h3>
+                            <h5>Nov 20, 2014 </h5>
+                            <span>By <a href="#">Admin</a></span>
+                        </div>
+                    </li>
+                    <li>
+                        <figure style="background:url(../static/rsmall2.jpg)no-repeat;"></figure>
+                        <div class="post-content">
+                            <h3><a href="#">Man Walking on the desert alone in sunset time.</a></h3>
+                            <h5>Nov 20, 2014 </h5>
+                            <span>By <a href="#">Admin</a></span>
+                        </div>
+                    </li>
+                    <li>
+                        <figure style="background:url(../static/rsmall3.jpg)no-repeat;"></figure>
+                        <div class="post-content">
+                            <h3><a href="#">Man Walking on the desert alone in sunset time.</a></h3>
+                            <h5>Nov 20, 2014 </h5>
+                            <span>By <a href="#">Admin</a></span>
+                        </div>
+                    </li>
+                    <li>
+                        <figure style="background:url(../static/rsmall4.jpg)no-repeat;"></figure>
+                        <div class="post-content">
+                            <h3><a href="#">Man Walking on the desert alone in sunset time.</a></h3>
+                            <h5>Nov 20, 2014 </h5>
+                            <span>By <a href="#">Admin</a></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- facebook like section -->
+            <div class="fb-sec">
+                <iframe src="#/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftemplate.net%2F&tabs&width=330&height=214&small_header=false&adapt_container_width=false&hide_cover=false&show_facepile=true&appId"
+                        width="100%" height="214" style="border:none;overflow:hidden" scrolling="no" frameborder="0"
+                        allowTransparency="true"></iframe>
+            </div>
+            <!-- Tag section -->
+            <div class="tag-sec">
+                <h3>Tag Cloud</h3>
+                <ul>
+                    <li><a href="#" class="sky-blue">photography</a></li>
+                    <li><a href="#" class="light-pink">food</a></li>
+                    <li><a href="#" class="nature">nature</a></li>
+                    <li><a href="#" class="health">health & wellness</a></li>
+                    <li><a href="#" class="sky-blue-d">food</a></li>
+                    <li><a href="#" class="dark">nature</a></li>
+                    <li><a href="#" class="jelly-bean">photography</a></li>
+                    <li><a href="#" class="kashmir-blue">food</a></li>
+                    <li><a href="#" class="green">nature</a></li>
+                </ul>
+            </div>
+            <!-- Twitter feed section -->
+            <div class="twitter-feed">
+                <h3>Twitter Feeds</h3>
+                <ul>
+                    <li>
+                        <blockquote>
+                            <a href="#" class="author">@Themes </a> And yes this is the only awsome ownload high qyality
+                            and free HD photos for <a href="#">commercial</a>
+                            <a href="#">free purpose...</a>
+                        </blockquote>
+                    </li>
+                    <li>
+                        <blockquote>
+                            <a href="#" class="author">@fotobazaar </a> download high qyality and <a href="#">free HD
+                            photos </a>for commercial free purpose...
+                        </blockquote>
+                    </li>
+                    <li>
+                        <blockquote>
+                            <a href="#" class="author">@landscapes </a> And yes this is the only awsome ownload high
+                            qyality and free HD photos for <a href="#">commercial</a>
+                            <a href="#">free purpose...</a>
+                        </blockquote>
+                    </li>
+                    <li>
+                        <blockquote>
+                            <a href="#" class="author">@Themes </a> And yes this is the only awsome ownload high qyality
+                            and free HD photos for <a href="#">commercial</a>
+                            <a href="#">free purpose...</a>
+                        </blockquote>
+                    </li>
+                </ul>
+                <span class="twitter-follow">跟随我们 <i class="fa fa-twitter"></i></span>
+            </div>
+        </aside>
+    </div>
+</section>
+<!-- Subscribe section -->
+<section class="subscribe-sec" style="background:url(../static/subscribe.jpg)" no-repeat;>
+    <div class="cover"></div>
+    <div class="container">
+        <h3>Subscribe to Newsletter</h3>
+        <h5>And get notified of new and latest posts</h5>
+        <div class="form">
+            <form>
+                <input type="text" placeholder="你的名字" required>
+                <input type="email" placeholder="您的email" required>
+                <button class="btn submit-btn">提交</button>
+            </form>
+        </div>
+    </div>
+</section>
+<!-- Popular posts section -->
+<section class="popular-posts">
+    <div class="row">
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t1.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>跟随我们</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t2.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>Follow Us</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t3.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>跟随我们</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t4.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>跟随我们</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t1.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>跟随我们</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 twt-post">
+            <img src="../static/t2.jpg" alt="t1">
+            <div class="hover-effect">
+                <div class="content">
+                    <h4>跟随我们</h4>
+                    <span><i class="fa fa-instagram"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer>
+    <div class="container">
+        <h5><a href="http://www.csdn.com/" target="_blank" title="物联网创业项目">物联网创业项目</a> - 内容收集来自 <a
+                href="http://www.cssmoban.com/" title="物联网创业项目" target="_blank">百度、CSDN</a></h5>
+    </div>
+</footer>
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/custom.js"></script>
+</body>
+</html>
