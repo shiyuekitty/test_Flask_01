@@ -1,5 +1,7 @@
 from flask import Flask, request
 import flask
+from _cookie import set_cookie,delete_cookie,get_cookie
+
 
 app = Flask(__name__)
 
@@ -21,7 +23,15 @@ def user(name):
     return flask.render_template("about.html")
 
 
-
+@app.route('/register', methods=['POST'])  #解析post数据
+def register():
+    print(request.headers)
+    print(request.form)
+    print(request.form['name'])
+    print(request.form.get('name'))
+    print(request.form.getlist('name'))
+    print(request.form.get('nickname', default='little apple'))
+    return 'weclome'
 
 
 @app.errorhandler(404)
