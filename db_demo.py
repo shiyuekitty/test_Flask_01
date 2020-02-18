@@ -24,22 +24,26 @@ class Role(db.Model):
     users = db.relationship("User", backref="role")
 
     def __repr__(self):
-        return "<Role object:name=%s %s>" % (self.name,self.id)
+        return "<Role object:name=%s %s>" % (self.name, self.id)
 
 
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), unique=True)
-    email=db.Column(db.String(32),unique=True)
-    password=db.Column(db.String(32))
+    email = db.Column(db.String(32), unique=True)
+    password = db.Column(db.String(32))
     # 设置外检
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
     def __repr__(self):
-        return "<User :%s %s %s %s>" %s(self.name,self.id,self.email,self.password)
+        return "<User :%s %s %s %s>" %(self.name, self.id, self.email, self.password)
+
+
 @app.route('/')
 def insex():
     return "hello world!"
+
 
 if __name__ == '__main__':
     # 创建表
